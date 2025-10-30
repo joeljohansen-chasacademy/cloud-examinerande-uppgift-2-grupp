@@ -16,7 +16,6 @@ A minimalist journaling application built with Next.js 14, TypeScript, Tailwind 
 
 ```bash
 git clone <repository-url>
-cd dagboks-appen
 ```
 
 ### 2. Install Dependencies
