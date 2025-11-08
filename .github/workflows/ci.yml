@@ -1,49 +1,56 @@
 name: CI
 
-# När ska workflow köras
+# 🕒 När workflow ska köras
 on:
   push:
     branches:
-      - develop        # Alla pushes till develop
-      - feature/*      # Alla pushes till feature-brancher
-      - ci/*           # Alla pushes till ci-brancher
+      - develop
+      - feature/*
+      - ci/*
   pull_request:
     branches:
-      - develop        # När en PR öppnas mot develop
+      - develop
 
 jobs:
   build:
     name: Lint, Test & Build
-    runs-on: ubuntu-latest  # Github Actions körs på Ubuntu VM
+    runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [20.x]   # Testa med Node 20 (Next.js rekommenderar senaste LTS)
+        node-version: [20.x]   # Node.js LTS version
 
     steps:
-      # 1️⃣ Hämta koden från GitHub
+      # 1️⃣ Hämta projektet
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2️⃣ Installera Node-version
+      # 2️⃣ Installera Node.js och cacha pnpm-data
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'pnpm'         # Sparar paket i cache för snabbare builds
+          cache: 'pnpm'
 
-      # 3️⃣ Installera projektets beroenden
+      # 3️⃣ Installera pnpm (viktigt!)
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9   # Senaste stabila version
+          run_install: false
+
+      # 4️⃣ Installera beroenden
       - name: Install dependencies
         run: pnpm install
 
-      # 4️⃣ Lint-kontroll (kodstil och syntax)
+      # 5️⃣ Lint – kontrollera kodstil
       - name: Lint code
         run: pnpm lint
 
-      # 5️⃣ Kör tester med Vitest
+      # 6️⃣ Kör tester
       - name: Run tests
         run: pnpm test
 
-      # 6️⃣ Bygg Next.js (checka att appen kan byggas)
+      # 7️⃣ Bygg Next.js
       - name: Build Next.js
         run: pnpm build
